@@ -15,7 +15,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
 import com.artem.weatherapp.domain.usecase.ToastDisplayErrorUseCase
 import com.artem.weatherapp.databinding.FragmentSearchCityBinding
-import com.artem.weatherapp.presentation.fragments.loadingContentFragment.LoadingContentUiState
 import com.artem.weatherapp.presentation.viewmodels.SharedViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -49,11 +48,7 @@ class SearchCityFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 searchCityVM.uiState.collect { currentUiState ->
-                    when (currentUiState) {
-                        is SearchCityUiState.Loading -> loadingIndicatorDisplay(currentUiState.isLoading)
-                        is SearchCityUiState.Success -> navigate(view = view)
-                        is SearchCityUiState.Error -> errorMessageDisplay(currentUiState.exception)
-                    }
+                    obtainEvent(uiState = currentUiState, view = view)
                 }
             }
         }
@@ -70,6 +65,15 @@ class SearchCityFragment : Fragment() {
         binding.searchCityButton.setOnClickListener {
             val cityName = binding.inputText.text.toString()
             searchCityVM.remoteGetCityWeather(cityName)
+        }
+    }
+
+
+    private fun obtainEvent(uiState: SearchCityUiState, view: View){
+        when (uiState) {
+            is SearchCityUiState.Loading -> loadingIndicatorDisplay(uiState.isLoading)
+            is SearchCityUiState.Success -> navigate(view = view)
+            is SearchCityUiState.Error -> errorMessageDisplay(uiState.exception)
         }
     }
 

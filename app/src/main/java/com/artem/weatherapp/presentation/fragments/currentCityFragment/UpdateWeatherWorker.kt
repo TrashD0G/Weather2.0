@@ -13,7 +13,6 @@ import java.util.*
 class UpdateWeatherWorker(appContext: Context, workerParams: WorkerParameters) :
     CoroutineWorker(appContext, workerParams) {
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
-
         val sdf = SimpleDateFormat("HH:mm:ss z")
         val currentTime: String = sdf.format(Date())
         Log.d("Worker", "Worker work!")

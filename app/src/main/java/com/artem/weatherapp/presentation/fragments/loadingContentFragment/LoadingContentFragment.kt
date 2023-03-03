@@ -1,20 +1,17 @@
 package com.artem.weatherapp.presentation.fragments.loadingContentFragment
 
-import android.content.Context
-import android.graphics.drawable.AnimationDrawable
+
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
-import com.artem.weatherapp.R
 import com.artem.weatherapp.databinding.FragmentLoadingContentBinding
 import com.artem.weatherapp.domain.usecase.ToastDisplayErrorUseCase
 import com.artem.weatherapp.presentation.viewmodels.SharedViewModel
@@ -59,25 +56,23 @@ class LoadingContentFragment : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 loadingContentVM.uiState.collect { currentUiState ->
-
-                    when (currentUiState) {
-                        is LoadingContentUiState.Loading -> loadingIndicatorDisplay(currentUiState.isLoading)
-                        is LoadingContentUiState.Success -> navigate(
-                            destination = "toCurrentCity",
-                            view = view
-                        )
-                        is LoadingContentUiState.Error -> navigate(
-                            destination = "toSearchCity",
-                            view = view
-                        )
-                    }
+                    obtainEvent(uiState = currentUiState, view = view)
                 }
             }
         }
     }
 
 
-    private fun navigate(destination: String, view: View) {
+    private fun obtainEvent(uiState: LoadingContentUiState, view: View) {
+        when (uiState) {
+            is LoadingContentUiState.Loading -> loadingIndicatorDisplay(uiState.isLoading)
+            is LoadingContentUiState.Success -> navigate(uiState = uiState, view = view)
+            is LoadingContentUiState.Error -> navigate(uiState = uiState, view = view)
+        }
+    }
+
+
+    private fun navigate(uiState: LoadingContentUiState, view: View) {
         val navController = view.findNavController()
         val toSearchCity =
             LoadingContentFragmentDirections.actionLoadingContentFragmentToSearchCityFragment()
@@ -85,11 +80,10 @@ class LoadingContentFragment : Fragment() {
             LoadingContentFragmentDirections.actionLoadingContentFragmentToCurrentCityFragment()
 
 
-        when (destination) {
-            "toCurrentCity" -> navController.navigate(toCurrentCity)
-            "toSearchCity" -> navController.navigate(toSearchCity)
+        when (uiState) {
+            is LoadingContentUiState.Success -> navController.navigate(toCurrentCity)
+            is LoadingContentUiState.Error -> navController.navigate(toSearchCity)
         }
-
     }
 
 

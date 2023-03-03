@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">WeatherApp</string>
+
+    <!-- Search city fragment -->
+    <string name="text_view_input_info">ENTER THE NAME OF CITY:</string>
+    <string name="button_search_city">SEARCH</string>
+    <string name="button_delete_db">DELETE DB</string>
+
+    <!-- Current city fragment -->
+    <string name="feels_like">FEELS LIKE</string>
+    <string name="wind_speed">WIND SPEED</string>
+    <string name="humidity">HUMIDITY</string>
+    <string name="pressure">PRESSURE</string>
+
+
+</resources>

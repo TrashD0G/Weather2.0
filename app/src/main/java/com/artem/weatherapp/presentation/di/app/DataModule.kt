@@ -2,10 +2,8 @@ package com.artem.weatherapp.presentation.di.app
 
 
 
-import android.content.Context
 import com.artem.weatherapp.data.api.ApiRequests
 import com.artem.weatherapp.data.db.WeatherDAO
-import com.artem.weatherapp.data.db.WeatherDatabase
 import com.artem.weatherapp.data.mappers.DomainCityWeatherMapper
 import com.artem.weatherapp.data.repository.WeatherRepositoryImpl
 import com.artem.weatherapp.data.storage.LocalWeatherStorage
@@ -14,7 +12,6 @@ import com.artem.weatherapp.domain.repository.WeatherRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -35,11 +32,8 @@ class DataModule {
         return WeatherRepositoryImpl(apiRequestsImp = apiRequest, localWeatherStorage = weatherStorage)
     }
 
-
     @Provides
     fun provideDomainCityWeatherMapper(): DomainCityWeatherMapper{
         return DomainCityWeatherMapper()
     }
-
-
 }

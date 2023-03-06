@@ -2,21 +2,20 @@ package com.artem.weatherapp.presentation.fragments.currentCityFragment
 
 import android.content.Context
 import android.util.Log
-import androidx.work.CoroutineWorker
-import androidx.work.WorkerParameters
+import androidx.work.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 
 
-class UpdateWeatherWorker(appContext: Context, workerParams: WorkerParameters) :
+class UpdateWeatherWorker(private val appContext: Context, workerParams: WorkerParameters) :
     CoroutineWorker(appContext, workerParams) {
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         val sdf = SimpleDateFormat("HH:mm:ss z")
         val currentTime: String = sdf.format(Date())
-        Log.d("Worker", "Worker work!")
-        Log.d("Worker", currentTime)
+        Log.d("NetworkStatusDebug", "Worker work!")
+        Log.d("NetworkStatusDebug", "Time: $currentTime")
         return@withContext Result.success()
     }
 }

@@ -1,7 +1,7 @@
 package com.artem.weatherapp.presentation.fragments.currentCityFragment
 
 
-
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -12,13 +12,18 @@ import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.NavHostFragment
 import androidx.work.*
 import com.artem.weatherapp.databinding.FragmentCurrentCityBinding
 import com.artem.weatherapp.presentation.viewmodels.SharedViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
+private const val DEBUG_TAG = "NetworkStatusDebug"
 
 @AndroidEntryPoint
 class CurrentCityFragment : Fragment() {
@@ -32,7 +37,7 @@ class CurrentCityFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentCurrentCityBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -58,24 +63,24 @@ class CurrentCityFragment : Fragment() {
         }
 
 
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val updateWeatherWorkRequest =
-            PeriodicWorkRequestBuilder<UpdateWeatherWorker>(
-                15,
-                TimeUnit.MINUTES
-            ).addTag("First worker")
-                .setConstraints(constraints)
-                .build()
+        startWorker(ctx = requireContext())
 
 
-        WorkManager.getInstance(requireContext()).enqueueUniquePeriodicWork(
-            "my_worker",
-            ExistingPeriodicWorkPolicy.KEEP,
-            updateWeatherWorkRequest
-        )
+        val nw = NetworkStatusTracker(requireContext())
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+
+                nw.networkStatus.collect { nwStatus ->
+                    when (nwStatus) {
+                        is NetworkStatus.Available -> Log.d(DEBUG_TAG, "Network Available")
+                        is NetworkStatus.Unavailable -> Log.d(DEBUG_TAG, "Network Unavailable")
+                        is NetworkStatus.Lost -> Log.d(DEBUG_TAG, "Network Lost")
+                        is NetworkStatus.NotConnected -> Log.d(DEBUG_TAG, "Network NotConnected")
+                    }
+                }
+            }
+        }
 
 
         binding.SearchFragmentButton.setOnClickListener {
@@ -93,5 +98,26 @@ class CurrentCityFragment : Fragment() {
     private fun navigateToSearchCity(fragment: Fragment) {
         val navController = NavHostFragment.findNavController(fragment)
         navController.navigate(CurrentCityFragmentDirections.actionCurrentCityFragmentToSearchCityFragment())
+    }
+
+    private fun startWorker(ctx: Context){
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val updateWeatherWorkRequest =
+            PeriodicWorkRequestBuilder<UpdateWeatherWorker>(
+                15,
+                TimeUnit.MINUTES
+            ).addTag("First worker")
+                .setConstraints(constraints)
+                .build()
+
+
+        WorkManager.getInstance(ctx).enqueueUniquePeriodicWork(
+            "my_worker",
+            ExistingPeriodicWorkPolicy.KEEP,
+            updateWeatherWorkRequest
+        )
     }
 }

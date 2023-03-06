@@ -1,24 +1,28 @@
 package com.artem.weatherapp.presentation.fragments.searchCityFragment
 
 
+
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
-import com.artem.weatherapp.domain.usecase.ToastDisplayErrorUseCase
 import com.artem.weatherapp.databinding.FragmentSearchCityBinding
+import com.artem.weatherapp.domain.usecase.ToastDisplayErrorUseCase
 import com.artem.weatherapp.presentation.viewmodels.SharedViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+
+
 
 @AndroidEntryPoint
 class SearchCityFragment : Fragment() {
